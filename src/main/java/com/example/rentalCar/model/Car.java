@@ -15,6 +15,7 @@ public class Car {
     private String color;
     private boolean rented;
     private int price;
+    private CarStatus carStatus;
 
     // Partition key
     @DynamoDbPartitionKey
@@ -71,6 +72,7 @@ public class Car {
         this.color = color;
     }
 
+    @DynamoDbAttribute("rented")
     public boolean isRented() {
         return rented;
     }
@@ -79,6 +81,7 @@ public class Car {
         this.rented = rented;
     }
 
+    @DynamoDbAttribute("price")
     public int getPrice() {
         return price;
     }
@@ -86,3 +89,13 @@ public class Car {
     public void setPrice(int price) {
         this.price = price;
     }
+
+    @DynamoDbAttribute("carStatus")
+    public CarStatus getCarStatus() {
+        return carStatus;
+    }
+
+    public void setCarStatus(CarStatus carStatus) {
+        this.carStatus = carStatus;
+    }
+}
