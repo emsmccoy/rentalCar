@@ -3,57 +3,40 @@ package com.example.rentalCar.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
+import java.net.URI;
+
 @Configuration
 public class DynamoDbConfig {
 
-	/*@Value("${aws.accessKey}")
-    private String accessKey;
+    @Value("${aws.accessKeyId}")
+    private String accessKeyId;
 
-    @Value("${aws.secretKey}")
-    private String secretKey;*/
+    @Value("${aws.secretAccessKey}")
+    private String secretAccessKey;
 
-    //@Value("${aws.region}")
-
-    @Value("${aws.region:eu-central-1}")
+    @Value("${aws.region}")
     private String region;
 
     @Bean
-    public DynamoDbClient dynamoDbClient() {
-        return DynamoDbClient.builder()
-                .credentialsProvider(DefaultCredentialsProvider.create())
+    public DynamoDbEnhancedClient dynamoDbEnhancedClient() {
+        DynamoDbClient dynamoDbClient = DynamoDbClient.builder()
+                .credentialsProvider(
+                        StaticCredentialsProvider.create(
+                                AwsBasicCredentials.create(accessKeyId, secretAccessKey)
+                        )
+                )
                 .region(Region.of(region))
+                .endpointOverride(URI.create("http://localhost:8000")) // for DynamoDB Local
                 .build();
-    }
 
-    @Bean
-    public DynamoDbEnhancedClient dynamoDbEnhancedClient(DynamoDbClient dynamoDbClient) {
         return DynamoDbEnhancedClient.builder()
                 .dynamoDbClient(dynamoDbClient)
                 .build();
     }
-
-	    /*@Bean
-    public DynamoDbClient dynamoDbClient() {
-        AwsBasicCredentials awsCreds = AwsBasicCredentials.create(accessKey, secretKey);
-
-        // Use DynamoDbClientBuilder instead of DynamoDbClient.Builder
-        DynamoDbClientBuilder builder = DynamoDbClient.builder()
-                .credentialsProvider(StaticCredentialsProvider.create(awsCreds))
-                .region(Region.of(region));
-
-        return builder.build();
-    }*/
-
-   /* @Bean
-    public DynamoDbEnhancedClient dynamoDbEnhancedClient(DynamoDbClient dynamoDbClient) {
-        return DynamoDbEnhancedClient.builder()
-                .dynamoDbClient(dynamoDbClient)
-                .build();
-    }*/
-
 }
