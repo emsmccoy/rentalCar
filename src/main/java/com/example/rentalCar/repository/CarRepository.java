@@ -9,6 +9,7 @@ import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 public class CarRepository {
@@ -36,7 +37,11 @@ public class CarRepository {
     public List<Car> findByDelegationId(String delegationId) {
         Key key = Key.builder().partitionValue(delegationId).build();
         QueryConditional queryConditional = QueryConditional.keyEqualTo(key);
-        return carTable.query(queryConditional).items();
+        // Convert SdkIterable to List using Stream API
+        return carTable.query(queryConditional)
+                .items()
+                .stream()
+                .collect(Collectors.toList());
     }
 
     // Delete a Car by delegationId and operation
